@@ -1,0 +1,180 @@
+<script>
+    function getClosestAncestor(el, selector) {
+        while (el) {
+            if ((typeof selector === 'string' && el.tagName.toLowerCase() === selector) ||
+                (el.classList && el.classList.contains(selector))) {
+                return el;
+            }
+            el = el.parentNode;
+        }
+        return null;
+    }
+    function removeTplVarIfFound(str, stringsArr) {
+        stringsArr.forEach(singleStr => {
+            str = str.replace(new RegExp('\\${' + singleStr + '}', 'g'), '');
+        })
+        return str
+    }
+
+    function replaceTplVariables(el, item, mappings = null) {
+        for (let key in item) {
+            el.innerHTML = el.innerHTML.replace(new RegExp('\\${' + key + '}', 'g'), mappings[key] ? mappings[key](item[key]) : (item[key] || ''));
+        }
+        for (let key in mappings) {
+            if (!Object.keys(item).includes(key)) {
+                el.innerHTML = el.innerHTML.replace(new RegExp('\\${' + key + '}', 'g'), mappings[key](item));
+            }
+        }
+
+        el.innerHTML = removeTplVarIfFound(el.innerHTML, ['isActive'])
+    }
+
+    function getFormData(formSelector, options = {}) {
+        const form = document.querySelector(formSelector);
+        const formData = {};
+
+        form.querySelectorAll('input, textarea').forEach(element => {
+            if (element.name) {
+                if (element.type === 'checkbox') {
+                    formData[element.name] = false
+                    if (element.checked) {
+                        formData[element.name] = true
+                    }
+                } else {
+                    formData[element.name] = element.value;
+                }
+            }
+        });
+
+        if(options.deleteIfEmpty){
+            options.deleteIfEmpty.forEach(key=>{
+                if(formData[key]===''){
+                    delete formData[key]
+                }
+            })
+        }
+
+        return formData;
+    }
+
+    function emptyFormData(formSelector) {
+        const form = document.querySelector(formSelector);
+    
+        form.querySelectorAll('input, textarea').forEach(element => {
+            if (element.type === 'checkbox') {
+                element.checked = false;
+            } else if (element.type === 'radio') {
+                element.checked = false;
+            } else {
+                element.value = '';
+            }
+        });
+    }
+
+    function fillFormData(formSelector, item) {
+        const form = document.querySelector(formSelector);
+    
+        for (let key in item) {
+            let element = form.querySelector(`[name="${key}"]`);
+    
+            if (element) {
+                if (element.type === 'checkbox') {
+                    element.checked = item[key];
+                } else if (element.type === 'radio') {
+                    form.querySelectorAll(`[name="${key}"]`).forEach(radio => {
+                        radio.checked = radio.value === item[key];
+                    });
+                } else {
+                    element.value = item[key];
+                }
+            }
+        }
+    }
+
+    function virtualForEach(templateSelector, items, idCb) {
+        const templateEl = document.querySelector(templateSelector)
+        const rootEl = templateEl.parentNode
+        /*console.log('virtualForEach',{
+            templateEl,rootEl,items,idCb
+        })*/
+
+        let scope = {
+            update(mappings = scope.lastMappings || {}) {
+                scope.lastMappings = mappings
+                templateEl.style.display = ''
+                rootEl.querySelectorAll('[data-id]').forEach(el => {
+                    el.parentNode.removeChild(el)
+                })
+                items.forEach(item => {
+                    const element = cloneNode(templateEl)
+                    /*console.log('virtualForEach update iterate',{
+                        item, element
+                    })*/
+                    element.id = ""
+                    element.dataset.id = item._id
+                    delete element.dataset.template
+                    replaceTplVariables(element, item, mappings)
+                    rootEl.appendChild(element);
+                });
+                templateEl.style.display = 'none'
+                return scope
+            },
+            ref: watchObject(items, ()=>{
+                scope.update()
+            }),
+            selectable(handler, findHandler = (id,items)=>items.find(i=>i.id===id)){
+                rootEl.querySelectorAll('[data-id]').forEach(el=>{
+                    if(!el.dataset.selectable){
+                        el.dataset.selectable=true
+                        el.addEventListener('click',()=>{
+                            handler(findHandler(el.dataset.id, items), items)
+                        })
+                    }
+                })
+            }
+        }
+        return scope
+    }
+
+    function cloneNode(node) {
+        if (!(node instanceof Node)) {
+            throw new Error("Clone Node: Node is not an instance of Node");
+        }
+
+        const clone = node.cloneNode(false);
+
+        for (let i = 0, len = node.childNodes.length; i < len; i++) {
+            clone.appendChild(cloneNode(node.childNodes[i]));
+        }
+
+        return clone;
+    }
+
+    function watchObject(obj, callback) {
+        let handler = {
+            get: function (target, property) {
+                if (typeof target[property] === 'object' && target[property] !== null) {
+                    return new Proxy(target[property], handler);
+                }
+                return target[property];
+            },
+            set: function (target, property, value) {
+                if (typeof value === 'object' && value !== null) {
+                    target[property] = new Proxy(value, handler);
+                } else {
+                    target[property] = value;
+                }
+                callback(property, value);
+                return true;
+            },
+            deleteProperty: function (target, property) {
+                delete target[property];
+                callback(property, null);
+                return true;
+            }
+        };
+
+        return new Proxy(obj, handler);
+    }
+
+</script>

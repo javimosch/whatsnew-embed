@@ -1,0 +1,32 @@
+<div class="fixed bg-blue-500 plugin p-20 rounded-lg  flex justify-center" data-hidden="1">
+    <div class="text-lg text-white">Title</div>
+</div>
+<style>
+    .plugin{
+        right:10px;
+        bottom:10px;
+    }
+    .plugin[data-hidden='1']{
+        display: none;
+    }
+</style>
+<script>
+    function usePlugin() {
+    }
+    app.pluginVM = {
+        mounted(){
+            console.log('usePluginVM mounted')
+        },
+        enable(){
+            
+            document.querySelector('.plugin').dataset.hidden='0'
+        },
+        disable(){
+            
+            document.querySelector('.plugin').dataset.hidden='1'
+        },
+        toggleMode(){
+
+        }
+    }
+</script>

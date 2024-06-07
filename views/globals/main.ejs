@@ -1,0 +1,11 @@
+<%- include('../css/styles.ejs') %>
+<%- include('../utils/helpers') %>
+<%- include('../composables/useApi') %>
+<script>
+  window.app = {}    
+</script>
+<%- include('./app.ejs') %>
+
+<script>
+  window.app.mounted()
+</script>

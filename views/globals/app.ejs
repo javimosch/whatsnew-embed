@@ -1,0 +1,19 @@
+<script>
+    (()=>{
+
+        app.removeMessageItem=removeMessageItem
+        app.mounted=mounted
+        
+        async function removeMessageItem(el){
+            window.event.stopImmediatePropagation()
+            let id = getClosestAncestor(el, 'li').dataset.id
+            const { removeMessage } = useApi()
+            await removeMessage(id)
+            await app.messagesVM.refreshMessages()
+        }
+
+        function mounted(){
+            console.info('app mounted')
+        }
+    })();
+</script>

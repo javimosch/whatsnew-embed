@@ -1,0 +1,57 @@
+<script>
+    function useApi() {
+
+        function removeMessage(id) {
+            return fetch(`/messages/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => response.json())
+                .then((response) => {
+                    console.info({ response })
+                    return response
+                })
+        }
+
+        function getMessages() {
+            return fetch('/messages')
+                .then(response => response.json())
+                .then(data => {
+                    return data
+                });
+        }
+
+
+        function saveMessage(formData) {
+
+            if(formData._id){
+                return fetch(`/messages/${formData._id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                }).then(response => response.json())
+                    .then((res) => {
+                       
+                        return res
+                    });
+            }
+
+            return fetch('/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            }).then(response => response.json())
+                .then((res) => {
+                   
+                    return res
+                });
+        }
+
+        return {saveMessage, getMessages, removeMessage}
+    }
+</script>

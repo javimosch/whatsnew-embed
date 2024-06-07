@@ -1,0 +1,81 @@
+<form id="editor-form" class="w-full pb-4 pt-4">
+    <input type="hidden" value="" name="_id" />
+    <input type="text" class="w-full p-2 mb-2 text-lg rounded-md shadow-md" placeholder="Title" value="Default Title"
+        name="title">
+    <input type="text" class="w-full p-2 mb-2 text-lg rounded-md shadow-md" placeholder="Short Title" name="shortTitle"
+        value="Default Short Title">
+    <input type="text" class="w-full p-2 mb-2 text-lg rounded-md shadow-md" placeholder="Short Description"
+        name="shortDescription" value="Default Short Description">
+    <input type="datetime-local" name="datetimeFrom" class="w-full p-2 mb-2 text-lg rounded-md shadow-md"
+        placeholder="Datetime From" value="2022-01-01T00:00">
+    <input type="datetime-local" name="datetimeTo" class="w-full p-2 mb-2 text-lg rounded-md shadow-md"
+        placeholder="Datetime To" value="2022-01-01T23:59">
+    <textarea name="html" onkeyup="app.messagesFormVM.onHtmlEditorKeyUp(event)" rows="10" cols="80"
+        class="w-full mb-2 text-lg rounded-md shadow-md">
+            <h1>What's new</h1>
+            <h2>Release notes</h2>
+            <ul>
+                <li>Location module improved</li>
+                <li>Switchable popups (Global improvement)</li>
+            </ul>
+            <iframe width="560" height="315" src="https://www.youtube.com/embed/VxS1Rw5iF4o?si=w_oFe7mpEKue2gj1&amp;controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </textarea>
+    <div class="flex items-center pb-2">
+        <input type="checkbox" id="isDraft" name="isDraft" class="w-6 h-6 text-blue-600">
+        <label for="isDraft" class="text-xl ml-2">Is Draft</label>
+    </div>
+
+    <div class="flex gap-2">
+        <button id="save-changes"
+            class="w-1/2 p-2 mb-2 text-lg rounded-md shadow-md bg-blue-500 hover:bg-blue-700 text-white">
+            Save Changes
+        </button>
+        <button 
+            class="w-1/2 p-2 mb-2 text-lg rounded-md shadow-md bg-gray-200 hover:bg-gray-300 text-black" onclick="app.messagesFormVM.select(null,event)">
+            Clear
+        </button>
+    </div>
+</form>
+
+
+<script>
+    document.getElementById('save-changes').addEventListener('click', async function onSaveClick(e) {
+        e.preventDefault();
+        const formData = getFormData('form', {
+            deleteIfEmpty: ['_id']
+        });
+        console.log({
+            formData,
+        })
+        const { saveMessage } = useApi()
+        await saveMessage(formData)
+
+        emptyFormData('form')
+
+        await app.messagesVM.refreshMessages()
+        document.querySelector('.htmlPrevew').innerHTML = ''
+    });
+
+    app.messagesFormVM = {}
+    app.messagesFormVM.onHtmlEditorKeyUp = event => {
+        let el = event.target
+        document.querySelector('.htmlPrevew').innerHTML = el.value
+    }
+    app.messagesFormVM.mounted = () => {
+        app.messagesFormVM.onHtmlEditorKeyUp({
+            target: document.querySelector('[name="html"]')
+        })
+    }
+    app.messagesFormVM.select = (item, e) => {
+        e && e.preventDefault();
+        if (!item) {
+            emptyFormData('form')
+            document.querySelector('.htmlPrevew').innerHTML = ''
+        } else {
+            fillFormData('form', item)
+            app.messagesFormVM.onHtmlEditorKeyUp({
+                target: document.querySelector('[name="html"]')
+            })
+        }
+    }
+</script>

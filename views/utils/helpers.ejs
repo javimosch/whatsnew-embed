@@ -92,14 +92,22 @@
     }
 
     function virtualForEach(templateSelector, items, idCb) {
-        const templateEl = document.querySelector(templateSelector)
-        const rootEl = templateEl.parentNode
-        /*console.log('virtualForEach',{
+        let templateEl = document.querySelector(templateSelector)
+        let rootEl = templateEl ? templateEl.parentNode : null
+        console.log('virtualForEach',{
             templateEl,rootEl,items,idCb
-        })*/
+        })
 
         let scope = {
             update(mappings = scope.lastMappings || {}) {
+
+                templateEl = templateEl ||  document.querySelector(templateSelector)
+                rootEl = rootEl|| (templateEl ? templateEl.parentNode : null)
+
+                if(!templateEl||!rootEl){
+                    return
+                }
+
                 scope.lastMappings = mappings
                 templateEl.style.display = ''
                 rootEl.querySelectorAll('[data-id]').forEach(el => {

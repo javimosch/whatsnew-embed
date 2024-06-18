@@ -4,6 +4,26 @@ const app = express();
 const {MongoClient, ObjectId} = require('mongodb')
 const dbName = process.env.DB_NAME || 'whatsnew';
 const morgan = require('morgan');
+const path = require('path')
+const fs = require('fs')
+
+app.get('/wn-client.js', (req, res) => {
+  
+  const initFunction = req.query.initFunction;
+  const filePath = path.join(process.cwd(), 'public', 'wn-client.js');
+  const fileContent = fs.readFileSync(filePath, 'utf8');
+  let modifiedContent = initFunction ? `\nwindow.wnClientInitFunction = ${initFunction};`+fileContent : fileContent
+  modifiedContent = `window.wnClientOptions = {
+    backendURL: '${req.protocol}://${req.get('host')}'
+  };`+modifiedContent
+  console.log('Serving wn-client.js',{
+    modifiedContent
+  })
+  res.set('Content-Type', 'application/javascript');
+  res.send(modifiedContent);
+});
+
+app.use(express.static('public'));
 
 app.use(express.json());
 //app.use(bodyParse>r.urlencoded({ extended: true }));
@@ -20,6 +40,10 @@ let dbConnectPromise = MongoClient.connect(process.env.MONGO_URI).then(function 
   app.client = client
 }).catch(err => {
   console.error('Fail to connect to mongo', { err })
+})
+
+app.get('/universalPlugin',(req,res)=>{
+  res.render('index', { title: 'Home Page' });
 })
 
 app.post('/messages', async (req, res) => {
@@ -118,7 +142,7 @@ app.get('/messages', async (req, res) => {
       const datetimeFrom = new Date(message.datetimeFrom);
       const datetimeTo = new Date(message.datetimeTo);
       if (!message.isDraft && datetimeFrom.getTime() <= now && now <= datetimeTo.getTime()) {
-        console.log('message could be active',message.title)
+        //console.log('message could be active',message.title)
         if (message.updatedAt && (!mostRecentUpdatedAt || message.updatedAt > mostRecentUpdatedAt)) {
           mostRecentUpdatedAt = message.updatedAt;
           mostRecentMessage = message;
@@ -141,10 +165,13 @@ app.get('/messages', async (req, res) => {
         }
       }
     }
-    console.log({
+    /*console.log({
       mostRecentMessage,
       mostRecentUpdatedAt
-    })
+    })*/
+    if(req.query.active){
+      messages = messages.filter(m=>m.isActive)
+    }
     res.send(messages);
   }
   catch (err) {

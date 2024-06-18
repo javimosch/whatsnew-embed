@@ -26,6 +26,10 @@
             class="w-1/2 p-2 mb-2 text-lg rounded-md shadow-md bg-blue-500 hover:bg-blue-700 text-white" onclick="app.pluginVM.toggleMode()">
             Toggle full mode
         </button>
+        <button 
+            class="w-1/2 p-2 mb-2 text-lg rounded-md shadow-md bg-blue-500 hover:bg-blue-700 text-white" onclick="app.pluginVM.clearCache()">
+            Clear cache
+        </button>
         </div>
     </div>
     <div class="w-1/2 flex flex-col justify-center items-center">
@@ -53,8 +57,13 @@
       </div>
     </div>
   </div>
+  <div class="newsRoot">
+    
+  </div>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-  <%- include('./composables/usePlugin.ejs') %>
+  <%- include('./composables/UsePluginUniversal.ejs') %> 
+  <!-- <%- include('./composables/usePlugin.ejs') %> -->
+  <script src="wn-client.js?initFunction=app.pluginVM.wnClientCallback"></script>
   <script>
     for(let key in app){
       if(key.includes('VM')){

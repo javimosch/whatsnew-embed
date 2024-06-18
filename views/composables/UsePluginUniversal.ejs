@@ -1,0 +1,38 @@
+<script>
+    /**
+    * Test the universal plugin in the WN Management GUI.
+    **/
+    (function () {
+        let root = app.pluginVM = {
+            plugin: null,
+            instance: null,
+            /**
+            * Called first by integration script
+            **/
+            wnClientCallback(pluginScope) {
+                console.log('plugin wnclient !', {
+                    pluginScope
+                })
+                root.plugin = pluginScope
+            },
+            mounted() {
+                root.instance = root.plugin.createInstance({
+                    target:'.newsRoot'
+                })
+                console.log('plugin-universal mounted')
+            },
+            enable(){
+                return root.instance.enable()
+            },
+            disable(){
+                return root.instance.disable()
+            }
+        }
+
+        //Expose instance methods
+        let exposeFns = ['enable','disable','toggleMode','clearCache','hideAllPanels','syncActiveMessage','updateDom']
+        for(let key of exposeFns){
+            root[key] = ()=>root.instance[key]()
+        }
+    })()
+</script>

@@ -64,7 +64,7 @@ module.exports = (app) =>{
         }
       });
       
-      app.get('/messages', async (req, res) => {
+      app.get('/messages', global.asyncWrapper(async (req, res) => {
         const collection = await prepareDbCollection('messages')
         const pageNumber = parseInt(req.query.page || 0);
         let response = []
@@ -131,7 +131,7 @@ module.exports = (app) =>{
           console.log({ err });
           res.status(500).send({ error: 'Failed to retrieve messages' });
         }
-      });
+      }));
       
       app.delete('/messages/:id', async (req, res) => {
         const collection = await prepareDbCollection('messages')

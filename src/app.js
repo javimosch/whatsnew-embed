@@ -7,6 +7,22 @@ const express = require('express');
 const app = express();
 
 /**
+ * Error handler
+ */
+const asyncWrapper = global.asyncWrapper = (fn, options = {}) => (req, res, next) => {
+  fn(req, res, next).catch((err) => {
+    const errorResponse = {
+      status: options.status || 500,
+      message: options.message || 'Internal Server Error',
+      errorCode: global.errorCode || options.errorCode || 'SERVER_ERROR',
+      errorDetails: err.message
+    };
+    delete global.errorCode
+    res.status(errorResponse.status).send(errorResponse);
+  });
+};
+
+/**
  * Configures request logger
  */
 const morgan = require('morgan');
@@ -42,5 +58,7 @@ app.get('/', (req, res) => {
  * Exposes public dir
  */
 app.use(express.static('public'));
+
+
 
 module.exports = app

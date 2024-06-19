@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "dev":"NODE_ENV=development bunx nodemon --exec 'node server.js' --watch server.js --watch src --watch package.json --watch views -e js,ejs"
   },
   "author": "",
   "license": "ISC",

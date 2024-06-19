@@ -8,7 +8,7 @@ module.exports = app => {
     const { minifyJS } = (require('../composables/useMinifyJS'))()
     const { tryCatch } = require('../helpers')
     
-    app.get('/wn-client.js', async (req, res) => {
+    app.get('/dist/wn-client.universal.min.js', async (req, res) => {
         const initFunction = req.query.initFunction;
         const filePath = path.join(process.cwd(), 'public','dist', 'wn-client.universal.min.js');
         const fileContent = fs.readFileSync(filePath, 'utf8');

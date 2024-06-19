@@ -155,7 +155,7 @@ import {virtualForEach} from './helpers'
                     document.querySelector(`.wnPlugin${instanceScope.modeSelector}`).dataset.hidden = '0'
                     instanceScope.updateDom()
                 } else {
-                    console.info(instanceName, 'checkInterval waiting',id)
+                    console.info(instanceName, 'checkInterval waiting (no active message found)',id)
                     instanceScope.checkIntervalTimetout = setTimeout(() => instanceScope.checkInterval(Date.now()), 1000 * (options.checkIntervalSeconds||15))
                 }
             },
@@ -191,7 +191,7 @@ import {virtualForEach} from './helpers'
                             localStorage[cacheKey] = '[]'
                         }
                         
-                        if (arr.includes(message._id.toString())) {
+                        if (message && arr.includes(message._id.toString())) {
                             console.log(instanceName, 'syncActiveMessage', 'skip-already-read')
                             return
                         }else{

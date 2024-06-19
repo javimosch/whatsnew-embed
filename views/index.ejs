@@ -12,69 +12,76 @@
     <div class="w-1/2 p-8">
       <h1 class="text-3xl font-bold mb-4">What's new?</h1>
       <%- include('./components/MessageForm.ejs') %>
-        <%- include('./components/MessagesList.ejs') %>
+      <%- include('./components/MessagesList.ejs') %>
 
-        
 
-        <div class="h-2 rounded-lg bg-gray-300 mt-4 mb-4"></div>
-        <div class="flex gap-4">
-          <button 
-            class="w-1/2 p-2 mb-2 text-lg rounded-md shadow-md bg-blue-500 hover:bg-blue-700 text-white" onclick="app.pluginVM.enable()">
-            Enable plugin
-        </button>
-        <button 
-            class="w-1/2 p-2 mb-2 text-lg rounded-md shadow-md bg-blue-500 hover:bg-blue-700 text-white" onclick="app.pluginVM.disable()">
-            Disable plugin
-        </button>
-        <!-- <button 
+
+          <div class="h-2 rounded-lg bg-gray-300 mt-4 mb-4"></div>
+          
+          <div class="flex gap-4 pb-4 pt-4">
+            <p>Test the integration using the following buttons</p>
+          </div>
+          <div class="flex gap-4">
+            <button class="w-1/2 p-2 mb-2 text-lg rounded-md shadow-md bg-blue-500 hover:bg-blue-700 text-white"
+              onclick="app.pluginVM.enable()">
+              Enable plugin
+            </button>
+            <button class="w-1/2 p-2 mb-2 text-lg rounded-md shadow-md bg-blue-500 hover:bg-blue-700 text-white"
+              onclick="app.pluginVM.disable()">
+              Disable plugin
+            </button>
+            <!-- <button 
             class="w-1/2 p-2 mb-2 text-lg rounded-md shadow-md bg-blue-500 hover:bg-blue-700 text-white" onclick="app.pluginVM.toggleMode()">
             Toggle full mode
         </button> -->
-        <button 
-            class="w-1/2 p-2 mb-2 text-lg rounded-md shadow-md bg-blue-500 hover:bg-blue-700 text-white" onclick="app.pluginVM.clearCache()">
-            Clear cache
-        </button>
-        </div>
+            <button class="w-1/2 p-2 mb-2 text-lg rounded-md shadow-md bg-blue-500 hover:bg-blue-700 text-white"
+              onclick="app.pluginVM.clearCache()">
+              Clear cache
+            </button>
+          </div>
+          
     </div>
     <div class="w-1/2 flex flex-col justify-center items-center">
       <h1 class="text-xl font-bold mb-4">Preview</h1>
       <div>
         <div class="htmlPrevew border-2 ">
-          
+
         </div>
         <style scoped>
           .htmlPrevew h1 {
             color: black;
-            font-size:30px;
-            padding-bottom:12px;
+            font-size: 30px;
+            padding-bottom: 12px;
           }
+
           .htmlPrevew h2 {
             color: black;
-            font-size:25px;
-            padding-bottom:8px;
+            font-size: 25px;
+            padding-bottom: 8px;
           }
-          .htmlPrevew iframe{
-            margin-bottom:10px;
-            margin-top:10px;
+
+          .htmlPrevew iframe {
+            margin-bottom: 10px;
+            margin-top: 10px;
           }
         </style>
       </div>
     </div>
   </div>
   <div class="newsRoot">
-    
+
   </div>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-  <%- include('./composables/UsePluginUniversal.ejs') %> 
-  <script src="wn-client.js?initFunction=app.pluginVM.wnClientCallback"></script>
-  <script>
-    for(let key in app){
-      if(key.includes('VM')){
-        app[key].mounted && app[key].mounted()
+  <%- include('./composables/UsePluginUniversal.ejs') %>
+    <script src="/dist/wn-client.universal.min.js?initFunction=app.pluginVM.wnClientCallback"></script>
+    <script>
+      for (let key in app) {
+        if (key.includes('VM')) {
+          app[key].mounted && app[key].mounted()
+        }
       }
-    }
-  </script>
-  
+    </script>
+
 </body>
 
 </html>

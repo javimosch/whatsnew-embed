@@ -31,7 +31,7 @@ module.exports = (app) => {
 
   app.patch('/messages/:id', async (req, res) => {
     const id = req.params.id;
-    const { html, title, shortTitle, shortDescription, datetimeFrom, datetimeTo, isDraft } = req.body;
+    const { html, title, shortTitle, shortDescription, datetimeFrom, datetimeTo, isDraft, archived } = req.body;
 
     const collection = await prepareDbCollection('messages')
 
@@ -46,6 +46,7 @@ module.exports = (app) => {
           datetimeFrom,
           datetimeTo,
           isDraft,
+          archived,
           updatedAt: Date.now()
         }
       };
@@ -144,7 +145,7 @@ module.exports = (app) => {
 
   app.patch('/messages/:id/archived',global.asyncWrapper(async(req,res)=>{
     const collection = await prepareDbCollection('messages')
-    let archived = ['1', 'true'].includes(req.body.archived || "")
+    let archived = ['1', 'true',true,1].includes(req.body.archived || "")
     await collection.updateOne({ _id: new ObjectId(req.params.id) }, { $set: { archived } });
     res.send({ message: `Message update successfully (archived to ${archived})` });
   }))

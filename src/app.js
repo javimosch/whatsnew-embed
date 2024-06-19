@@ -2,7 +2,7 @@
  * Configures loading .env file
  */
 require('dotenv').config()
-
+require('./bootstrap')
 const express = require('express');
 const app = express();
 

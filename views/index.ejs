@@ -3,6 +3,7 @@
 
 <head>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <%- include('./globals/main.ejs') %>
 </head>
 
@@ -62,7 +63,6 @@
   </div>
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
   <%- include('./composables/UsePluginUniversal.ejs') %> 
-  <!-- <%- include('./composables/usePlugin.ejs') %> -->
   <script src="wn-client.js?initFunction=app.pluginVM.wnClientCallback"></script>
   <script>
     for(let key in app){

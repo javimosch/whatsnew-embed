@@ -24,7 +24,7 @@
     </div>
 
     <!-- Small mode -->
-    <div class="wnFixed wnFlexCol wnBgBlue500 wnPlugin wnSmall wnPl10 wnPr10 wnPb20 wnPt5 wnRoundedLg wnFlex wnJustifyCenter" data-hidden="1">
+    <div class="wnFixed wnFlexCol wnBgBlue500 wnPlugin wnSmall wnPl10 wnPr10 wnPb20 wnPt5 wnRoundedLg wnFlex wnJustifyCenter animate__animated animate__fadeInRight" data-hidden="1">
         <div class="wnWFull wnFlex wnJustifyEnd">
             <div>
                 <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" viewBox="0 0 24 24">
@@ -181,6 +181,24 @@
     .wnHtml .wnHtml iframe {
         margin-bottom: 10px;
         margin-top: 10px;
+    }
+    .wnHtml *{
+        font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+    }
+    .wnHtml [role=button],.wnHtml button {
+        cursor: pointer;
+    }
+    .wnHtml button,.wnHtml input,.wnHtml optgroup,.wnHtml select,.wnHtml textarea {
+        font-family: inherit;
+        font-size: 100%;
+        line-height: 1.15;
+        margin: 0;
+    }
+    .wnHtml *,.wnHtml ::after,.wnHtml ::before {
+        box-sizing: border-box;
+        border-width: 0;
+        border-style: solid;
+        border-color: currentColor;
     }
 </style>`
 
@@ -396,6 +414,9 @@
                 })
 
 
+            },
+            openHistoryView(){
+                alert('openHistoryView')
             }
         }
         if (options.autoInit !== false) {

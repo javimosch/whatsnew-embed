@@ -17,7 +17,7 @@ module.exports = app => {
           backendURL: '${req.protocol}://${req.get('host')}'
         };`+ modifiedContent
         await tryCatch('Try to minify wn-client', async () => {
-            if (process.env.NODE_ENV === 'production') {
+            if (global.NODE_ENV === 'production') {
                 const { code } = await minifyJS(modifiedContent)
                 modifiedContent = code
                 modifiedContent = modifiedContent.replace(/\n|\r/g, '')

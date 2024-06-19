@@ -1,8 +1,9 @@
 <script>
     function useApi() {
 
-        function removeMessage(id) {
-            return fetch(`/messages/${id}`, {
+        function removeMessage(id, params = {}) {
+            let queryParams = new URLSearchParams(params);
+            return fetch(`/messages/${id}?${queryParams.toString()}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -14,8 +15,10 @@
                 })
         }
 
-        function getMessages() {
-            return fetch('/messages')
+        function getMessages(params = {}) {
+            let queryParams = new URLSearchParams(params);
+            let url = `/messages?${queryParams.toString()}`;
+            return fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     return data
@@ -23,9 +26,22 @@
         }
 
 
+        function updateMessageArchived(id, archived = false) {
+            return fetch(`/messages/${id}/archived`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ archived })
+            }).then(response => response.json())
+                .then((res) => {
+                    return res
+                });
+        }
+
         function saveMessage(formData) {
 
-            if(formData._id){
+            if (formData._id) {
                 return fetch(`/messages/${formData._id}`, {
                     method: 'PATCH',
                     headers: {
@@ -34,7 +50,7 @@
                     body: JSON.stringify(formData)
                 }).then(response => response.json())
                     .then((res) => {
-                       
+
                         return res
                     });
             }
@@ -47,11 +63,11 @@
                 body: JSON.stringify(formData)
             }).then(response => response.json())
                 .then((res) => {
-                   
+
                     return res
                 });
         }
 
-        return {saveMessage, getMessages, removeMessage}
+        return { saveMessage, getMessages, removeMessage,updateMessageArchived }
     }
 </script>

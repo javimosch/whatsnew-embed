@@ -1,18 +1,30 @@
 <script>
-    (()=>{
+    (() => {
 
-        app.removeMessageItem=removeMessageItem
-        app.mounted=mounted
-        
-        async function removeMessageItem(el){
+        app.removeMessageItem = removeMessageItem
+        app.updateMessageItemArchived = updateMessageItemArchived
+        app.mounted = mounted
+
+        async function updateMessageItemArchived(el, archived) {
             window.event.stopImmediatePropagation()
-            let id = getClosestAncestor(el, 'li').dataset.id
-            const { removeMessage } = useApi()
-            await removeMessage(id)
-            await app.messagesVM.refreshMessages()
+            if (window.confirm(archived?'Confirm Archive?':'Confirm unArchive?')) {
+                let id = getClosestAncestor(el, 'li').dataset.id
+                const { updateMessageArchived } = useApi()
+                await updateMessageArchived(id, archived)
+                await app.messagesVM.refreshMessages()
+            }
+        }
+        async function removeMessageItem(el, params = {}) {
+            window.event.stopImmediatePropagation()
+            if (window.confirm('Confirm Delete?')) {
+                let id = getClosestAncestor(el, 'li').dataset.id
+                const { removeMessage } = useApi()
+                await removeMessage(id)
+                await app.messagesVM.refreshMessages()
+            }
         }
 
-        function mounted(){
+        function mounted() {
             console.info('app mounted')
         }
     })();

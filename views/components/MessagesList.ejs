@@ -1,18 +1,31 @@
 <ul id="message-list" class="flex flex-col gap-4 list-none mb-0 w-1/2 pb-4 pt-4 ">
 
-    <li id="li-template" data-template class="bg-grey-700 flex justify-between relative transition" onclick="app.messagesVM.select(event)">
+    <li id="li-template" data-template class="bg-grey-700 flex justify-between relative transition"
+        onclick="app.messagesVM.select(event)">
         <div class="relative w-full">
             ${title} ${leftLabel}
-            <br/>
+            <br />
             <i class="text-xs">${updatedAt}</i>
         </div>
         <%- include('./MessageRemoveIcon.ejs') %>
+        
+        ${archiveAction}
+
+        <!-- mapping property -->
         ${isActiveStyle}
     </li>
 
 </ul>
 <button class="w-max p-2 mb-2 text-lg rounded-md shadow-md bg-gray-200 hover:bg-gray-300 text-gray-800"
-    onclick="app.messagesVM.refreshMessages()">Refresh</button>
+    onclick="app.messagesVM.refreshMessages()">
+    Refresh
+</button>
+
+<div class="flex items-center pb-2 archivedForm">
+    <input type="checkbox" id="showArchived" name="showArchived" class="w-6 h-6 text-blue-600">
+    <label for="showArchived" class="text-xl ml-2">Show archived</label>
+</div>
+
 <style scoped>
     #message-list li {
 
@@ -26,20 +39,38 @@
     app.messagesVM.mounted = () => {
         app.messagesVM.refreshMessages();
     }
-    app.messagesVM.select = function(e){
+    app.messagesVM.select = function (e) {
         console.log(e.target)
     }
     app.messagesVM.refreshMessages = async () => {
         const { getMessages } = useApi()
-        let data = await getMessages()
+
+        const formData = getFormData('.archivedForm');//{showArchived:true}
+
+        let data = await getMessages(formData)
         let mappings = {
-            updatedAt(v){
+            updatedAt(v) {
                 return moment(v).format('DD-MM-YYYY HH:mm')
             },
-            leftLabel(item){
-                return item.isActive||item.isDraft ? `<b style="position:absolute;right: -150px;top: 12px;">${item.isActive?'ACTIVE':'DRAFT'}</b>`:''
+            leftLabel(item) {
+                return item.isActive || item.isDraft ? `<b style="position:absolute;right: -250px;top: 12px;">${item.isActive ? 'ACTIVE' : 'DRAFT'}</b>` : ''
             },
-            isActiveStyle(item){
+            archiveAction(item){
+                return `<div class="remove w-16 flex justify-center items-center p-2 bg-transparent transition duration-300 cursor-pointer hover:bg-red-500"
+                onclick="app.updateMessageItemArchived(this,${item.archived?false:true})"
+                title="${item.archived?'unarchive':'archive'}"
+                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+                    <path fill="currentColor" d="M3 3h18v4H3zm1 5h16v13H4zm5.5 3a.5.5 0 0 0-.5.5V13h6v-1.5a.5.5 0 0 0-.5-.5z" />
+                </svg>
+                <style scoped>
+                    .remove:hover path {
+                        fill: white;
+                    }
+                </style>
+            </div>`            
+            },
+            isActiveStyle(item) {
                 return item.isActive ? `
             <style scoped>
                 li[data-id='${item._id}']{
@@ -49,16 +80,16 @@
                     background-color:#c3c5c34d;
                 }
                 <style>
-            `:''
+            `: ''
             }
         }
-        app.messagesVM.list = virtualForEach('#li-template',data,item=>item.id).update(mappings)
-        app.messagesVM.list.selectable(item=>{
+        app.messagesVM.list = virtualForEach('#li-template', data, item => item.id).update(mappings)
+        app.messagesVM.list.selectable(item => {
             console.log({
                 item
             })
             app.messagesFormVM.select(item)
-        }, (id,items)=>items.find(i=>i._id==id))
+        }, (id, items) => items.find(i => i._id == id))
         app.messagesVM.items = data
     }
     app.messagesVM.mounted()

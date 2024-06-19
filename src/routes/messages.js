@@ -67,7 +67,7 @@ module.exports = (app) => {
   app.get('/messages', global.asyncWrapper(async (req, res) => {
     const collection = await prepareDbCollection('messages')
     const pageNumber = parseInt(req.query.page || 0);
-    let response = []
+    let response
     let messages = []
 
     try {
@@ -103,7 +103,7 @@ module.exports = (app) => {
       messages.forEach((message) => {
         const datetimeFrom = new Date(message.datetimeFrom);
         const datetimeTo = new Date(message.datetimeTo);
-        if (!message.isDraft && datetimeFrom.getTime() <= now && now <= datetimeTo.getTime()) {
+        if (!message.isDraft&&!message.archived && datetimeFrom.getTime() <= now && now <= datetimeTo.getTime()) {
           //console.log('message could be active',message.title)
           if (message.updatedAt && (!mostRecentUpdatedAt || message.updatedAt > mostRecentUpdatedAt)) {
             mostRecentUpdatedAt = message.updatedAt;
@@ -121,7 +121,7 @@ module.exports = (app) => {
         for (const message of messages) {
           const datetimeFrom = new Date(message.datetimeFrom);
           const datetimeTo = new Date(message.datetimeTo);
-          if (!message.isDraft && datetimeFrom <= now && now <= datetimeTo) {
+          if (!message.isDraft&&!message.archived && datetimeFrom <= now && now <= datetimeTo) {
             message.isActive = true;
             break;
           }

@@ -10,16 +10,17 @@
             * Called first by integration script
             **/
             wnClientCallback(pluginScope) {
-                console.log('plugin wnclient !', {
+                console.log('pluginVM wnClientCallback', {
                     pluginScope
                 })
                 root.plugin = pluginScope
             },
             mounted() {
                 root.instance = root.plugin.createInstance({
-                    target:'.newsRoot'
+                    target:'.newsRoot',
+                    checkIntervalSeconds:5
                 })
-                console.log('plugin-universal mounted')
+                console.log('plugin-universal mounted 2')
             },
             enable(){
                 return root.instance.enable()

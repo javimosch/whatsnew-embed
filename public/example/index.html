@@ -1,0 +1,14 @@
+<h1>Project (GeoredV3 / Citipav)</h1>
+<div class="newsRoot"></div>
+<script>
+    function wnClientCallback(wnClient) {
+        window.wnClientInstance = wnClient.createInstance({
+            target: '.newsRoot',
+            checkIntervalSeconds: 5
+        })
+    }
+    var script = document.createElement('script');
+    script.type = 'application/javascript';
+    script.src = '/wn-client.js?initFunction=wnClientCallback';
+    document.head.appendChild(script);
+</script>

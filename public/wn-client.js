@@ -9,7 +9,7 @@
 <div class="wnHtml">   
 
     <!-- Big mode -->
-    <div class="wnFixed wnFlexCol wnBgBlue500 wnPlugin wnBig wnPl10 wnPr10 wnPb20 wnPt20 wnRoundedLg wnFlex">
+    <div class="wnFixed wnFlexCol wnBgBlue500 wnPlugin wnBig wnPl10 wnPr10 wnPb20 wnPt20 wnRoundedLg wnFlex" data-hidden="1">
         <div id="wnMsgTemplatewnBigParent">
             <div id="wnMsgTemplatewnBig" data-template>
                 <div class="wnText4xl wnTextWhite">#{title}</div>
@@ -186,20 +186,31 @@
 
     let scope = {
         name: 'wnClient-1.0',
-        createInstance(options = {}) {
-            return createInstance(options, scope)
+        backendURL:'',//
+        createInstance(options) {
+            console.info({
+                options
+            })
+            return createInstanceInternal({
+                backendURL:scope.backendURL,
+                ...options
+            })
         }
     }
 
-    console.log('wn-client', {
+    /* console.log('wn-client', {
         hasInitFn: !!window.wnClientInitFunction,
         hasOpts: !!window.wnClientOptions
-    })
+    }) */
 
+    /**
+     * NodeJS fills backendURL automatically
+     */
     if (window.wnClientOptions) {
         Object.assign(scope, window.wnClientOptions)
         delete window.wnClientOptions
     }
+
     if (window.wnClientInitFunction) {
         window.wnClientInitFunction(scope)
         delete window.wnClientInitFunction
@@ -208,11 +219,14 @@
     /**
      * Creates plugin instance (Max: 1)
      * @param {*} options 
-     * @param {*} rootScope 
      * @returns 
      */
-    function createInstance(options = {}, rootScope = {}) {
-        const instanceName = 'wnClientInstance (createInstance)'
+    function createInstanceInternal(options = {}) {
+        const id = `ID-${Date.now()}`
+        const instanceName = `wnClient-${id}`
+        console.log(instanceName,'createInstance',{
+            options
+        })
 
         if (!options.target) {
             console.error(instanceName, 'options.target required')
@@ -240,32 +254,86 @@
             msgBigCloseBtn: '.wnMsgBigCloseBtn',
             plugin: '.wnPlugin',
             msgLearnMoreBtn: '.wnMsgLearnMoreBtn',
-            msgTemplate:()=> `#wnMsgTemplate${instanceScope.modeSelector}` 
+            msgTemplate: () => `#wnMsgTemplate${instanceScope.modeSelector}`
         };
+
+        /**
+         * The localStorage cache key used to store the already read news ids
+         */
+        const cacheKey = 'wnReadMsgs'
 
         // and the updated code:
 
+        function markActiveMessageAsRead() {
+            let am = instanceScope.activeMessage
+            let id = am._id
+            let arr = JSON.parse(localStorage.getItem(cacheKey) || '[]')
+            if (!arr.includes(id)) {
+                arr.push(id)
+            }
+            localStorage.setItem(cacheKey, JSON.stringify(arr))
+        }
+
         let instanceScope = {
-            ...rootScope,
-            modeSelector: selectors.modeSelectorBig,
+            backendURL:options.backendURL,
+            modeSelector: selectors.modeSelectorSmall,
             activeMessage: null,
+            isEnabled: false,
             mounted() {
                 console.log(instanceName, 'mounted')
                 instanceScope.enable()
 
                 document.querySelector(selectors.msgBigCloseBtn).addEventListener('click', () => {
-                    instanceScope.toggleMode()
+                    markActiveMessageAsRead()
+                    instanceScope.hideAllPanels()
+                    instanceScope.activeMessage = null
+                    instanceScope.checkInterval()
+                    instanceScope.modeSelector = selectors.modeSelectorSmall
                 })
             },
             async enable() {
-                console.log(instanceName, 'enable', instanceScope.modeSelector)
-                document.querySelector(`.wnPlugin${instanceScope.modeSelector}`).dataset.hidden = '0'
-                await instanceScope.syncActiveMessage()
-                instanceScope.updateDom()
+                instanceScope.disable()
+                console.log(instanceName, 'enable')
+                instanceScope.isEnabled = true
+                instanceScope.checkInterval()
             },
+            /**
+             * Disable plugin
+             */
             disable() {
-                document.querySelector(`.wnPlugin${instanceScope.modeSelector}`).dataset.hidden = '1'
+                console.info(instanceName, 'disable')
+                //Hide panels (big/small)
+                instanceScope.hideAllPanels()
+                //Disable checkinterval
+                instanceScope.isEnabled = false
+                clearTimeout(instanceScope.checkIntervalTimetout)
             },
+            hideAllPanels() {
+                console.info(instanceName, 'hideAllPanels')
+                document.querySelectorAll(`.wnPlugin`).forEach(el => el.dataset.hidden = '1')
+            },
+            isCurrentPanelVisible() {
+                return document.querySelector(`.wnPlugin${instanceScope.modeSelector}`).dataset.hidden === '0'
+            },
+            /**
+             * Check DB each 30s and open 
+             */
+            async checkInterval(id = Date.now()) {
+                console.info(instanceName, 'checkInterval')
+                await instanceScope.syncActiveMessage()
+                if (instanceScope.activeMessage && !instanceScope.isCurrentPanelVisible()) {
+                    window.clearInterval(instanceScope.checkIntervalTimetout)
+                    console.info(instanceName, 'checkInterval found-something')
+                    document.querySelector(`.wnPlugin${instanceScope.modeSelector}`).dataset.hidden = '0'
+                    instanceScope.updateDom()
+                } else {
+                    console.info(instanceName, 'checkInterval waiting',id)
+                    instanceScope.checkIntervalTimetout = setTimeout(() => instanceScope.checkInterval(Date.now()), 1000 * (options.checkIntervalSeconds||15))
+                }
+            },
+            /**
+             * @unused
+             */
             toggleMode() {
                 console.info(instanceName, 'toggleMode')
                 instanceScope.modeSelector = instanceScope.modeSelector === selectors.modeSelectorBig ? selectors.modeSelectorSmall : selectors.modeSelectorBig
@@ -273,7 +341,7 @@
                 instanceScope.enable()
             },
             clearCache() {
-                window.localStorage.wnMgsRead = ''
+                window.localStorage[cacheKey] = ''
             },
             hideAllPanels() {
                 document.querySelectorAll(selectors.plugin).forEach(el => {
@@ -281,12 +349,32 @@
                 })
             },
             syncActiveMessage() {
-                return fetch(`${instanceScope.backendURL}/messages?active=1`)
+                return fetch(`${options.backendURL}/messages?active=1`)
                     .then(response => response.json())
                     .then(data => {
-                        instanceScope.activeMessage = data.length > 0 ? data[0] : null
-                        console.log(instanceName,'syncActiveMessage',{
-                            messages:instanceScope.activeMessage
+                        let message = data.length > 0 ? data[0] : null
+                        let arr 
+                        try{
+                            arr= JSON.parse(localStorage.getItem(cacheKey) || '[]')
+                        }catch(err){
+                            console.error(`While parsing ${cacheKey}`,{
+                                err
+                            })
+                            localStorage[cacheKey] = '[]'
+                        }
+                        
+                        if (arr.includes(message._id.toString())) {
+                            console.log(instanceName, 'syncActiveMessage', 'skip-already-read')
+                            return
+                        }else{
+                            console.log(instanceName, 'syncActiveMessage', 'check-success',{
+                                message,
+                                arr
+                            })
+                        }
+                        instanceScope.activeMessage = message
+                        console.log(instanceName, 'syncActiveMessage', {
+                            messages: instanceScope.activeMessage
                         })
                         return
                     });
@@ -297,6 +385,7 @@
                 let mappings = {
                     computedTitle: item => item.shortTitle || item.title
                 }
+
                 virtualForEachInt(selector, instanceScope.activeMessage ? [instanceScope.activeMessage] : [], item => item._id).update(mappings)
 
                 console.log(instanceName, 'bind', document.querySelectorAll(selectors.msgLearnMoreBtn))
@@ -318,6 +407,8 @@
 
     //Helpers------------------
 
+
+
     function replaceTplVariablesInt(el, item, mappings = null) {
         for (let key in item) {
             el.innerHTML = el.innerHTML.replace(new RegExp('\\#{' + key + '}', 'g'), mappings[key] ? mappings[key](item[key]) : (item[key] || ''));
@@ -333,19 +424,19 @@
     function virtualForEachInt(templateSelector, items, idCb) {
         let templateEl = document.querySelector(templateSelector)
         let rootEl = templateEl ? templateEl.parentNode : null
-        console.log('virtualForEach',{
-            templateEl,rootEl,items,idCb
+        console.log('virtualForEach', {
+            templateEl, rootEl, items, idCb
         })
 
         let scope = {
             update(mappings = scope.lastMappings || {}) {
 
-                templateEl = templateEl ||  document.querySelector(templateSelector)
-                rootEl = rootEl|| (templateEl ? templateEl.parentNode : null)
+                templateEl = templateEl || document.querySelector(templateSelector)
+                rootEl = rootEl || (templateEl ? templateEl.parentNode : null)
 
-                if(!templateEl||!rootEl){
-                    console.log('vfe update fail',{
-                        templateEl,rootEl
+                if (!templateEl || !rootEl) {
+                    console.log('vfe update fail', {
+                        templateEl, rootEl
                     })
                     return
                 }
@@ -356,8 +447,8 @@
                     el.parentNode.removeChild(el)
                 })
                 items.forEach(item => {
-                    const element = cloneNode(templateEl)
-                    console.log('virtualForEachInt update iterate',{
+                    const element = cloneNodeInt(templateEl)
+                    console.log('virtualForEachInt update iterate', {
                         item, element
                     })
                     element.id = ""
@@ -367,20 +458,20 @@
                     rootEl.appendChild(element);
                 });
                 templateEl.style.display = 'none'
-                console.log('vfe update success',{
+                console.log('vfe update success', {
                     len: items.length,
                     rootEl
                 })
                 return scope
             },
-            ref: watchObject(items, ()=>{
+            ref: watchObjectInt(items, () => {
                 scope.update()
             }),
-            selectable(handler, findHandler = (id,items)=>items.find(i=>i.id===id)){
-                rootEl.querySelectorAll('[data-id]').forEach(el=>{
-                    if(!el.dataset.selectable){
-                        el.dataset.selectable=true
-                        el.addEventListener('click',()=>{
+            selectable(handler, findHandler = (id, items) => items.find(i => i.id === id)) {
+                rootEl.querySelectorAll('[data-id]').forEach(el => {
+                    if (!el.dataset.selectable) {
+                        el.dataset.selectable = true
+                        el.addEventListener('click', () => {
                             handler(findHandler(el.dataset.id, items), items)
                         })
                     }
@@ -388,6 +479,54 @@
             }
         }
         return scope
+    }
+
+    function watchObjectInt(obj, callback) {
+        let handler = {
+            get: function (target, property) {
+                if (typeof target[property] === 'object' && target[property] !== null) {
+                    return new Proxy(target[property], handler);
+                }
+                return target[property];
+            },
+            set: function (target, property, value) {
+                if (typeof value === 'object' && value !== null) {
+                    target[property] = new Proxy(value, handler);
+                } else {
+                    target[property] = value;
+                }
+                callback(property, value);
+                return true;
+            },
+            deleteProperty: function (target, property) {
+                delete target[property];
+                callback(property, null);
+                return true;
+            }
+        };
+
+        return new Proxy(obj, handler);
+    }
+
+    function cloneNodeInt(node) {
+        if (!(node instanceof Node)) {
+            throw new Error("Clone Node: Node is not an instance of Node");
+        }
+
+        const clone = node.cloneNode(false);
+
+        for (let i = 0, len = node.childNodes.length; i < len; i++) {
+            clone.appendChild(cloneNodeInt(node.childNodes[i]));
+        }
+
+        return clone;
+    }
+
+    function removeTplVarIfFound(str, stringsArr) {
+        stringsArr.forEach(singleStr => {
+            str = str.replace(new RegExp('\\${' + singleStr + '}', 'g'), '');
+        })
+        return str
     }
 
 })()

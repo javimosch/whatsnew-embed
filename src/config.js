@@ -7,11 +7,12 @@ global.DB_CONNECTION_FAIL_EXIT_TIMEOUT_SECONDS = 10
 global.MONGO_URI = ''
 global.DB_NAME = ''
 global.NODE_ENV = 'development'
+global.PORT = 3000
 
 
 //---------------------------------------------------------
 
-let variables = ['DB_CONNECTION_FAIL_EXIT_TIMEOUT_SECONDS','MONGO_URI','DB_NAME','NODE_ENV']
+let variables = ['DB_CONNECTION_FAIL_EXIT_TIMEOUT_SECONDS','MONGO_URI','DB_NAME','NODE_ENV','PORT']
 let sensitive = ['MONGO_URI']
 /**
  * - Replace config with values from env if availble

@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "dev":"NODE_ENV=development bunx nodemon --exec 'node server.js' --watch server.js --watch src --watch package.json --watch views -e js,ejs"
+    "dev":"bunx run-p dev:*",
+    "dev:server": "NODE_ENV=development bunx nodemon --exec 'node server.js' --watch server.js --watch src --watch package.json --watch views -e js,ejs",
+    "dev:client":"NODE_ENV=development bunx vite build --mode development --watch"
   },
   "author": "",
   "license": "ISC",
@@ -16,11 +18,14 @@
     "hasha": "^6.0.0",
     "mongodb": "^6.7.0",
     "morgan": "^1.10.0",
+    "terser": "^5.31.1",
     "tmp": "^0.2.3",
-    "uglify-js": "^3.18.0"
+    "uglify-js": "^3.18.0",
+    "vite": "^5.3.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "npm-run-all2": "^6.2.0",
     "supertest": "^7.0.0"
   }
 }

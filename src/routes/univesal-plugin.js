@@ -14,7 +14,7 @@ module.exports = app => {
         const fileContent = fs.readFileSync(filePath, 'utf8');
         let modifiedContent = initFunction ? `\nwindow.wnClientInitFunction = ${initFunction};` + fileContent : fileContent
         modifiedContent = `window.wnClientOptions = {
-          backendURL: '${req.protocol}://${req.get('host')}'
+          backendURL: '${req.protocol||''}://${req.get('host')}'
         };`+ modifiedContent
         await tryCatch('Try to minify wn-client', async () => {
             if (global.NODE_ENV === 'production') {

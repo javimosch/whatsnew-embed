@@ -120,6 +120,8 @@ import {virtualForEach} from './helpers'
                 })
             },
             async enable() {
+                instanceScope.hideAllPanels()
+                instanceScope.modeSelector='.wnSmall'
                 instanceScope.disable()
                 console.log(instanceName, 'enable')
                 instanceScope.isEnabled = true
@@ -138,10 +140,13 @@ import {virtualForEach} from './helpers'
             },
             hideAllPanels() {
                 console.info(instanceName, 'hideAllPanels')
-                document.querySelectorAll(`.wnPlugin`).forEach(el => el.dataset.hidden = '1')
+                document.querySelectorAll(`.wnPlugin [data-hidden]`).forEach(el => el.dataset.hidden = '1')
             },
             isCurrentPanelVisible() {
-                return document.querySelector(`.wnPlugin${instanceScope.modeSelector}`).dataset.hidden === '0'
+                return document.querySelector(instanceScope.modeSelector).dataset.hidden === '0'
+            },
+            toggleCurrentPanel(value){
+                document.querySelector(instanceScope.modeSelector).dataset.hidden = value
             },
             /**
              * Check DB each 30s and open 
@@ -152,7 +157,7 @@ import {virtualForEach} from './helpers'
                 if (instanceScope.activeMessage && !instanceScope.isCurrentPanelVisible()) {
                     window.clearInterval(instanceScope.checkIntervalTimetout)
                     console.info(instanceName, 'checkInterval found-something')
-                    document.querySelector(`.wnPlugin${instanceScope.modeSelector}`).dataset.hidden = '0'
+                    instanceScope.toggleCurrentPanel('0')
                     instanceScope.updateDom()
                 } else {
                     console.info(instanceName, 'checkInterval waiting (no active message found)',id)
@@ -206,6 +211,12 @@ import {virtualForEach} from './helpers'
                         })
                         return
                     });
+            },
+            openList(){
+                console.info(instanceName,'openList')
+                instanceScope.hideAllPanels()
+                instanceScope.modeSelector='.wnList'
+                instanceScope.toggleCurrentPanel('0')
             },
             updateDom() {
                 let selector = selectors.msgTemplate().split('.').join('')

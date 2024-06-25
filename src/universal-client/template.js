@@ -1,9 +1,14 @@
 export default `
-<div class="wnHtml">   
+<div class="wnPlugin">   
+
+<!-- List mode -->
+<div class="wnFixed wnFlexCol wnBgBlue500 wnPlugin wnList wnPl10 wnPr10 wnPb20 wnPt20 wnRoundedLg wnFlex" data-hidden="1">
+    <div class="wnText4xl wnTextWhite">The list goes here</div>
+</div>
 
     <!-- Big mode -->
     <div class="wnFixed wnFlexCol wnBgBlue500 wnPlugin wnBig wnPl10 wnPr10 wnPb20 wnPt20 wnRoundedLg wnFlex" data-hidden="1">
-        <div id="wnMsgTemplatewnBigParent">
+        <div>
             <div id="wnMsgTemplatewnBig" data-template>
                 <div class="wnText4xl wnTextWhite">#{title}</div>
                 <div class="wnMt4">
@@ -12,7 +17,7 @@ export default `
             </div>
         </div>
         <button class="wnMsgBigCloseBtn wnMt4 wnBgWhite wnDarkBgZinc800 wnHoverDarkBgZinc700 wnHoverBgZinc100 wnTextBlue600 wnDarkTextBlue400 wnFontBold wnPy2 wnPx4 wnRounded">
-            Mark as read
+            OK (Mark as read)
         </button>
     </div>
 
@@ -39,33 +44,33 @@ export default `
     </div>
 </div>
 <style scoped>
-    .wnHtml .wnFixed {
+    .wnPlugin .wnFixed {
         position: fixed;
     }
 
-    .wnHtml .wnJustifyEnd {
+    .wnPlugin .wnJustifyEnd {
         justify-content: flex-end;
     }
 
-    .wnHtml .wnWFull {
+    .wnPlugin .wnWFull {
         width: 100%;
     }
 
-    .wnHtml .wnFlexCol {
+    .wnPlugin .wnFlexCol {
         display: flex;
         flex-direction: column;
     }
 
-    .wnHtml .wnBgBlue500 {
+    .wnPlugin .wnBgBlue500 {
         background-color: #3498db;
     }
 
-    .wnHtml .wnPlugin {
+    .wnPlugin .wnPlugin {
         padding: 20px 10px;
         border-radius: 0.5rem;
     }
 
-    .wnHtml .wnBig {
+    .wnPlugin .wnBig, .wnPlugin .wnList {
         width: 60vw;
         margin: 0 auto;
         left: 50%;
@@ -73,57 +78,57 @@ export default `
         top: 10%;
     }
 
-    .wnHtml .wnSmall {
+    .wnPlugin .wnSmall {
         right: 10px;
         bottom: 10px;
         max-width: 350px;
     }
 
-    .wnHtml .wnRoundedLg {
+    .wnPlugin .wnRoundedLg {
         border-radius: 0.5rem;
     }
 
-    .wnHtml .wnFlex {
+    .wnPlugin .wnFlex {
         display: flex;
     }
 
-    .wnHtml .wnJustifyCenter {
+    .wnPlugin .wnJustifyCenter {
         justify-content: center;
     }
 
-    .wnHtml .wnMt4 {
+    .wnPlugin .wnMt4 {
         margin-top: 1rem;
     }
 
-    .wnHtml .wnPl10 {
+    .wnPlugin .wnPl10 {
         padding-left: 2.5rem;
     }
 
-    .wnHtml .wnPr10 {
+    .wnPlugin .wnPr10 {
         padding-right: 2.5rem;
     }
 
-    .wnHtml .wnPb20 {
+    .wnPlugin .wnPb20 {
         padding-bottom: 5rem;
     }
 
-    .wnHtml .wnPt20 {
+    .wnPlugin .wnPt20 {
         padding-top: 5rem;
     }
 
-    .wnHtml .wnPt5 {
+    .wnPlugin .wnPt5 {
         padding-top: 1.25rem;
     }
 
-    .wnHtml .wnText4xl {
+    .wnPlugin .wnText4xl {
         font-size: 2.25rem;
     }
 
-    .wnHtml .wnTextWhite {
+    .wnPlugin .wnTextWhite {
         color: #ffffff;
     }
 
-    .wnHtml .wnMsgBigCloseBtn {
+    .wnPlugin .wnMsgBigCloseBtn {
         background-color: #ffffff;
         border-radius: 0.25rem;
         padding: 0.5rem 1rem;
@@ -131,15 +136,15 @@ export default `
         font-weight: bold;
     }
 
-    .wnHtml .wnMsgTitle {
+    .wnPlugin .wnMsgTitle {
         font-weight: bold;
     }
 
-    .wnHtml .wnMsgShortDescription {
+    .wnPlugin .wnMsgShortDescription {
         margin-top: 1.5rem;
     }
 
-    .wnHtml .wnMsgLearnMoreBtn {
+    .wnPlugin .wnMsgLearnMoreBtn {
         background-color: #ffffff;
         border-radius: 0.25rem;
         padding: 0.5rem 1rem;
@@ -147,47 +152,47 @@ export default `
         font-weight: bold;
     }
 
-    .wnHtml [data-hidden='1'] {
+    .wnPlugin [data-hidden='1'] {
         display: none;
     }
 
-    .wnHtml .wnHtml a, 
-    .wnHtml .wnHtml h1, 
-    .wnHtml .wnHtml h2, 
-    .wnHtml .wnHtml p, 
-    .wnHtml .wnHtml span, 
-    .wnHtml .wnHtml li {
+    .wnPlugin .wnPlugin a, 
+    .wnPlugin .wnPlugin h1, 
+    .wnPlugin .wnPlugin h2, 
+    .wnPlugin .wnPlugin p, 
+    .wnPlugin .wnPlugin span, 
+    .wnPlugin .wnPlugin li {
         color: #ffffff;
     }
 
-    .wnHtml .wnHtml h1 {
+    .wnPlugin .wnPlugin h1 {
         color: #000000;
         font-size: 30px;
         padding-bottom: 12px;
     }
 
-    .wnHtml .wnHtml h2 {
+    .wnPlugin .wnPlugin h2 {
         font-size: 25px;
         padding-bottom: 8px;
     }
 
-    .wnHtml .wnHtml iframe {
+    .wnPlugin .wnPlugin iframe {
         margin-bottom: 10px;
         margin-top: 10px;
     }
-    .wnHtml *{
+    .wnPlugin *{
         font-family: ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
     }
-    .wnHtml [role=button],.wnHtml button {
+    .wnPlugin [role=button],.wnPlugin button {
         cursor: pointer;
     }
-    .wnHtml button,.wnHtml input,.wnHtml optgroup,.wnHtml select,.wnHtml textarea {
+    .wnPlugin button,.wnPlugin input,.wnPlugin optgroup,.wnPlugin select,.wnPlugin textarea {
         font-family: inherit;
         font-size: 100%;
         line-height: 1.15;
         margin: 0;
     }
-    .wnHtml *,.wnHtml ::after,.wnHtml ::before {
+    .wnPlugin *,.wnPlugin ::after,.wnPlugin ::before {
         box-sizing: border-box;
         border-width: 0;
         border-style: solid;

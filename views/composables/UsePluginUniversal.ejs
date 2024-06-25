@@ -31,7 +31,7 @@
         }
 
         //Expose instance methods
-        let exposeFns = ['enable','disable','toggleMode','clearCache','hideAllPanels','syncActiveMessage','updateDom']
+        let exposeFns = ['enable','disable','toggleMode','clearCache','hideAllPanels','syncActiveMessage','updateDom','openList']
         for(let key of exposeFns){
             root[key] = ()=>root.instance[key]()
         }

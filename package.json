@@ -5,19 +5,23 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "dev":"bunx run-p dev:*",
+    "dev": "bunx run-p dev:*",
     "dev:server": "NODE_ENV=development bunx nodemon --exec 'node server.js' --watch server.js --watch src --watch package.json --watch views -e js,ejs",
-    "dev:client":"NODE_ENV=development bunx vite build --mode development --watch"
+    "dev:client": "NODE_ENV=development bunx vite build --mode development --watch"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
     "hasha": "^6.0.0",
     "mongodb": "^6.7.0",
+    "mongoose": "^8.5.1",
     "morgan": "^1.10.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "terser": "^5.31.1",
     "tmp": "^0.2.3",
     "uglify-js": "^3.18.0",

@@ -6,6 +6,8 @@ require('./bootstrap')
 const express = require('express');
 const app = express();
 
+
+
 /**
  * Error handler
  */
@@ -33,6 +35,8 @@ app.use(morgan('dev'));
  */
 app.use(express.json());
 
+app.use(require('cors')('*'))
+
 app.set('view engine', 'ejs');
 
 /**
@@ -40,6 +44,13 @@ app.set('view engine', 'ejs');
  */
 const { init: initDb } = require('./db')
 initDb(app)
+
+
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('../swagger');
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 /**
  * Configures universal plugin
  */
@@ -48,6 +59,11 @@ require('./routes/univesal-plugin')(app)
  * Configures messages CRUD routes
  */
 require('./routes/messages')(app)
+
+const newsApiRoutes = require('./routes/news-api');
+// Use the news API routes
+app.use('/api', newsApiRoutes);
+
 /**
  * Exposes root route
  */
@@ -60,5 +76,8 @@ app.get('/', (req, res) => {
 app.use(express.static('public'));
 
 
+// Run migration on app start
+const { migrateMessagesToNews } = require('./migrations');
+migrateMessagesToNews().catch(console.error);
 
 module.exports = app
